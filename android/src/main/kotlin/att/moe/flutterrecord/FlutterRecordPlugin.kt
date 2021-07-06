@@ -122,9 +122,13 @@ class FlutterRecordPlugin : MethodCallHandler {
         runnable = Runnable {
           json.put("current_volume", maxVolume.toDouble() * mediaRecorder!!.maxAmplitude / 32768 + 1)
           MethodChannel(reg.messenger(), channelName).invokeMethod("updateVolume", json.toString())
-          taskHandler.postDelayed(runnable, frequency)
+          runnable?.let{
+            taskHandler.postDelayed(it, frequency)
+          }
         }
-        taskHandler.postDelayed(runnable, frequency)
+        runnable?.let{
+          taskHandler.postDelayed(it, frequency)
+        }
       }
 
       result.success(lastRecordPath)
@@ -134,9 +138,12 @@ class FlutterRecordPlugin : MethodCallHandler {
   }
 
   private fun stopRecorder(result: Result, isCancel: Boolean = false) {
-    if (runnable != null) {
-      taskHandler.removeCallbacks(runnable)
-      runnable = null
+//    if (runnable != null) {
+//      taskHandler.removeCallbacks(runnable)
+//      runnable = null
+//    }
+    runnable?.let{
+      taskHandler.removeCallbacks(it)
     }
 
     try {
